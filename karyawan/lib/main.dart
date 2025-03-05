@@ -60,7 +60,6 @@ class MyHomePage extends StatelessWidget {
                       Text("Alamat: ${snapshot.data![index].alamat.jalan},"
                           "${snapshot.data![index].alamat.kota},"
                           "${snapshot.data![index].alamat.provinsi}"),
-                          
                     ],
                   ),
                 );

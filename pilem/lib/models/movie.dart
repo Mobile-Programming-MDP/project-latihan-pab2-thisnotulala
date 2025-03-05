@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class Movie {
   final int id;
   final String title;
@@ -7,7 +5,7 @@ class Movie {
   final String posterPath;
   final String backdropPath;
   final String releaseDate;
-  final Double voteAverage;
+  final double voteAverage;
 
   Movie(
       {required this.id,
