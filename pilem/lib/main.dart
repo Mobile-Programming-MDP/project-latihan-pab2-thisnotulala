@@ -3,7 +3,9 @@ import 'package:pilem/screens/home_screen.dart';
 import 'package:pilem/screens/search_screen.dart';
 import 'package:pilem/screens/favorite_screen.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -26,11 +28,11 @@ class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
-  MainScreenState createState() => MainScreenState();
+  State<MainScreen> createState() => MainScreenState();
 }
 
 class MainScreenState extends State<MainScreen> {
-  int _selectedIndext = 0;
+  int _selectedIndex = 0;
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -40,16 +42,16 @@ class MainScreenState extends State<MainScreen> {
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndext = index;
+      _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndext],
+      body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndext,
+        currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -63,7 +65,7 @@ class MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: 'Favorite',
-          ),
+          )
         ],
       ),
     );

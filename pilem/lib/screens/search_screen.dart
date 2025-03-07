@@ -5,7 +5,6 @@ import 'package:pilem/services/api_service.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
-
   @override
   SearchScreenState createState() => SearchScreenState();
 }
@@ -37,7 +36,6 @@ class SearchScreenState extends State<SearchScreen> {
 
     final List<Map<String, dynamic>> searchData =
         await _apiService.searchMovies(_searchController.text);
-
     setState(() {
       _searchResults = searchData.map((e) => Movie.fromJson(e)).toList();
     });
@@ -108,7 +106,7 @@ class SearchScreenState extends State<SearchScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (contect) => DetailScreen(movie: movie),
+                            builder: (context) => DetailScreen(movie: movie),
                           ),
                         );
                       },
