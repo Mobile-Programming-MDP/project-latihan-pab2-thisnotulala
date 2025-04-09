@@ -22,8 +22,6 @@ class DefaultFirebaseOptions {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
-      case TargetPlatform.iOS:
-        return ios;
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
@@ -56,15 +54,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '165569077221',
     projectId: 'fasum-app-62747',
     storageBucket: 'fasum-app-62747.firebasestorage.app',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCxzHs3qs8quYXhZNwi9Uo1qSjhP0wcA9M',
-    appId: '1:165569077221:ios:08c43c7cf42f92f243990c',
-    messagingSenderId: '165569077221',
-    projectId: 'fasum-app-62747',
-    storageBucket: 'fasum-app-62747.firebasestorage.app',
-    iosBundleId: 'com.example.fasum',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
