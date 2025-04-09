@@ -10,8 +10,7 @@ class HomeScreen extends StatelessWidget {
     await FirebaseAuth.instance.signOut();
 
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => SignInScreen()));
-        
+        MaterialPageRoute(builder: (context) => const SignInScreen()));
   }
 
   @override
