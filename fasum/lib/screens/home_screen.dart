@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fasum/screens/add_post_screen.dart';
 import 'package:fasum/screens/detail_screen.dart';
 import 'package:fasum/screens/edit_post_screen.dart';
+import 'package:fasum/screens/my_posts_screen.dart';
 import 'package:fasum/screens/sign_in_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String? _currentUserId;
   String? selectedCategory;
   //ambil dari add_post_screen
   List<String> categories = [
@@ -312,6 +314,35 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Stream<QuerySnapshot<Map<String, dynamic>>>? _getPostsStream() {
+    if (selectedCategory == null) {
+      // Return all posts if no category is selected
+      print("Filter by user id ${_currentUserId}");
+      return FirebaseFirestore.instance
+          .collection("posts")
+          .where("userId", isNotEqualTo: _currentUserId)
+          .orderBy('createdAt', descending: true)
+          .snapshots();
+    } else {
+      // Return posts filtered by the selected category
+      print("Filter by Category ${selectedCategory}");
+      return FirebaseFirestore.instance
+          .collection("posts")
+          .where("category", isEqualTo: selectedCategory)
+          .orderBy('createdAt', descending: true)
+          .snapshots();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      _currentUserId = currentUser.uid;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -336,20 +367,37 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {});
         },
         child: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection("posts")
-              .orderBy('createdAt', descending: true)
-              .snapshots(),
+          key: const ValueKey("postsStream"),
+          stream: _getPostsStream(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
+            print("Start");
+            //print("Data " + snapshot.data!.docs.length.toString());
+            print("Has Data ${snapshot.hasData}");
+            print("Category ${selectedCategory}");
+            //print("Has Data ${snapshot.hasData}");
+            //print(snapshot.data?.docs);
+
+            if (snapshot.hasError) {
+              print("Trapped in has error ${!snapshot.hasData}");
+              print("${snapshot.error}");
+
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              print("Trapped in Laoding Data ${!snapshot.hasData}");
+              //print("Data " + snapshot.data!.docs.length.toString());
               return const Center(child: CircularProgressIndicator());
             }
 
-            final posts = snapshot.data!.docs.where((doc) {
-              final data = doc.data();
-              final category = data['category'] ?? 'Lainnya';
-              return selectedCategory == null || selectedCategory == category;
-            }).toList();
+            final posts = snapshot.data!.docs;
+            //.where((doc) {
+            //   final data = doc.data();
+            //   final category = data['category'] ?? 'Lainnya';
+            //   return true;
+            //   //return selectedCategory == null || selectedCategory == category;
+            // });
+            //.toList();
 
             if (posts.isEmpty) {
               return const Center(
@@ -370,7 +418,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 final latitude = data['latitude'];
                 final longitude = data['longitude'];
                 final category = data['category'] ?? 'Lainnya';
-                final currentUser = FirebaseAuth.instance.currentUser;
                 final userId = data['userId'] ?? "";
                 //parse ke DateTime
                 final createdAt = DateTime.parse(createdAtStr);
@@ -438,6 +485,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
                                       const SizedBox(height: 6),
+                                      Text(category)
                                     ],
                                   ),
                                   Row(
@@ -455,8 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Icons.thumb_up,
                                               size: 20,
                                               color: (data['likes'] ?? [])
-                                                      .contains(
-                                                          currentUser?.uid)
+                                                      .contains(_currentUserId)
                                                   ? Colors.blue
                                                   : Colors.grey,
                                             ),
@@ -490,8 +537,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Icons.comment,
                                               size: 20,
                                               color: (data['comments'] ?? [])
-                                                      .contains(
-                                                          currentUser?.uid)
+                                                      .contains(_currentUserId)
                                                   ? Colors.blue
                                                   : Colors.grey,
                                             ),
@@ -513,8 +559,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
 
                                       //Menu Edit dan Hapus
-                                      if (currentUser != null &&
-                                          currentUser.uid == userId)
+                                      if (_currentUserId == userId)
                                         Row(
                                           children: [
                                             const SizedBox(
@@ -616,13 +661,29 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => AddPostScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            heroTag: "myPostButton",
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => MyPostsScreen()),
+              );
+            },
+            child: const Icon(Icons.person),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            heroTag: "addPostButton",
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddPostScreen()),
+              );
+            },
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }
